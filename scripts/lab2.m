@@ -43,8 +43,6 @@ for i = 1:N
   % Normalize cepstrogram
   mfccs = (mfccs - repmat(mean(mfccs,2), [1 length(t)])) ./ ...
     repmat(std(mfccs,0,2), [1 length(t)]);
-  mean(mfccs,2)
-  std(mfccs,0,2)
   
   figure
   imagesc(t,f,10*log10(spectgram));
@@ -69,4 +67,26 @@ for i = 1:N
   title(sprintf('Cepstrogram of the sound file %s\n', sounds(i).name));
   xlabel('Time [s]')
   ylabel('Cepstral coefficients')
- end
+end
+
+%% Correlation test with the speech signal female.wav
+
+assert(strcmp(sounds(1).name, 'female.wav'))
+
+[mfccs, spectgram, f, t] = GetSpeechFeatures(sounds(1).y, ...
+  sounds(1).fs, winlength, ncep);
+
+% Correlation coefficients between spectral coefficients
+rho1 = corr(spectgram');
+% Correlation coefficients between cepstral coefficients
+rho2 = corr(mfccs');
+
+figure
+imagesc(abs(rho1));
+colormap gray; colorbar
+title('Correlation coefficients between spectral coefficients')
+
+figure
+imagesc(abs(rho2));
+colormap gray; colorbar
+title('Correlation coefficients between cepstral coefficients')
